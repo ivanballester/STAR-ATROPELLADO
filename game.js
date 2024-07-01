@@ -12,8 +12,9 @@ startBtnNode.addEventListener("click",()=>{
     startBtnNode.style.display = "none"
 })
 
-//GAME BOX
+//GAME BOX 
 const gameBoxNode = document.querySelector("#game-box")
+
 
 //VARIABLES
 const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a una repeticion de las mismas
@@ -21,14 +22,7 @@ let mainInterval = null;
 let player = null;
 let tieInterval = null;
 let tieArr = []
-for (let i = 0; i < 5; i++) {
-    tieArr.push(new Enemigo(Math.random() * (gameBoxNode.offsetWidth - 50), gameBoxNode.offsetHeight));
-}
 let tieArr2 = []
-for (let i = 0; i < 5; i++) {
-    agregarNave()
-}
-
 
 //FUNCIONES DEL JUEGO
 
@@ -42,23 +36,29 @@ const startGame = ()=>{
     }, Math.round(1000/60))
 
     tieInterval = setInterval(() => {
-        
-    }, 2000);
+        tieSpawn()
+        console.log(tieArr)
+        tieDespawn()
+    }, 3000);
 }
 const gameLoop = ()=>{
     enemyMove()
 }
 const movePlayer = () => { //".has" comprueba si existe en el Set
     if (keysPressed.has("d")) {
+        player.node.src = "/images/wingXD.png"
         player.x += 10;
     }
     if (keysPressed.has("a")) {
+        player.node.src = "/images/wingXI.png"
         player.x -= 10;
     }
     if (keysPressed.has("s")) {
+        player.node.src = "/images/wingXA.png"
         player.y += 10;
     }
     if (keysPressed.has("w")) {
+        player.node.src = "/images/wingX.png"
         player.y -= 10;
     }
 
@@ -75,11 +75,30 @@ const enemyMove = () =>{
    })
 
 }
-const agregarNave = ()=>{
-    let newEnemy = new Enemigo(Math.random() * (gameBoxNode.offsetWidth - 50), -50)
-    // Aqui verificas que la nave haya colisionado con otra nave del array, si no hay colission -> push
-    // Y si hay colision -> agregarNave(); y hacemos return
-    tieArr2.push(newEnemy);
+const tieSpawn = () => {
+    
+for (let i = 0; i < 5; i++) {
+    tieArr.push(new Enemigo(Math.random() * (gameBoxNode.offsetWidth - 50), gameBoxNode.offsetHeight));
+}
+
+for (let i = 0; i < 5; i++) {
+    tieArr2.push(new Enemigo(Math.random() * (gameBoxNode.offsetWidth - 50), -50))
+}
+}
+const tieDespawn = () =>{
+    let firstTie = tieArr[0]
+    if (firstTie && firstTie.y <= 0 - firstTie.h){     
+
+        tieArr.splice(0, 5)
+        tieArr2.splice(0 ,5)
+        firstTie.node.remove()
+    }
+}
+const gameOver = ()=>{
+clearInterval(mainInterval)
+clearInterval(tieInterval)
+gameScreenNode.style.display = "none"
+gameOverScreenNode.style.display = "flex"
 }
 
 
