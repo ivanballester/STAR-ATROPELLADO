@@ -6,8 +6,8 @@ class Enemigo {
 
         this.x = x
         this.y = y
-        this.w = 50 
-        this.h = 50
+        this.w = 38 
+        this.h = 38
         
 
         this.speed = 1
@@ -15,7 +15,7 @@ class Enemigo {
          
          this.node.style.position = `absolute`
          this.node.style.width = `${this.w}px`
-         this.node.style.width = `${this.h}px`
+         this.node.style.height = `${this.h}px`
          this.node.style.top = `${this.y}px`
          this.node.style.left = `${this.x}px`
     }
