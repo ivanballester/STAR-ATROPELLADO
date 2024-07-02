@@ -21,8 +21,10 @@ const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a
 let mainInterval = null;
 let player = null;
 let tieInterval = null;
+let laserInterval = null;
 let tieArr = []
 let tieArr2 = []
+let disparoArr = []
 
 //FUNCIONES DEL JUEGO
 
@@ -37,27 +39,44 @@ const startGame = ()=>{
         tieSpawn()
         console.log(tieArr)   
     }, 3000);
+
+    laserInterval = setInterval(() => {
+        disparoSpawn()
+        console.log(disparoArr)
+    }, 1000);
 }
 const gameLoop = ()=>{
     enemyMove()
     playerEnemyCollision()
     tieDespawn()
+    // disparoMovement()
+    // forEach de todos disparos, y cada disparo se mueve
+    disparoArr.forEach((disparo)=>{
+        disparo.disparoMovement()
+    })
+        
+    
+
 }
 const movePlayer = () => { //".has" comprueba si existe en el Set
     if (keysPressed.has("d")) {
         player.node.src = "/images/wingXD.png"
+        player.orientacion = "derecha"
         player.x += 10;
     }
     if (keysPressed.has("a")) {
         player.node.src = "/images/wingXI.png"
+        player.orientacion = "izquierda"
         player.x -= 10;
     }
     if (keysPressed.has("s")) {
         player.node.src = "/images/wingXA.png"
+        player.orientacion = "abajo"
         player.y += 10;
     }
     if (keysPressed.has("w")) {
         player.node.src = "/images/wingX.png"
+        player.orientacion = "arriba"
         player.y -= 10;
     }
 
@@ -91,6 +110,7 @@ const tieDespawn = () =>{
         tieArr.splice(0, 5)
         tieArr2.splice(0 ,5)
         firstTie.node.remove()
+        //remover nodo de los 5 primeros de un array y los 5 del otro array
     }
 }
 const gameOver = ()=>{
@@ -122,7 +142,10 @@ const playerEnemyCollision = () =>{
 
     })
 }
-
+const disparoSpawn = ()=>{
+    let disparo = new Disparo(player.x, player.y, player.orientacion)
+    disparoArr.push(disparo)
+}
 
 //EVENTOS
 

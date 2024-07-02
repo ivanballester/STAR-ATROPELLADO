@@ -7,6 +7,7 @@ class Player {
         this.y = 400 
         this.w = 50 
         this.h = 50 
+        this.orientacion = "arriba"
 
        
         this.node.style.position = `absolute`
