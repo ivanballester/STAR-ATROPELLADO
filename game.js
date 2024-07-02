@@ -31,18 +31,17 @@ const startGame = ()=>{
     player = new Player ()
     mainInterval = setInterval(()=>{
         gameLoop()
-
-
     }, Math.round(1000/60))
 
     tieInterval = setInterval(() => {
         tieSpawn()
-        console.log(tieArr)
-        tieDespawn()
+        console.log(tieArr)   
     }, 3000);
 }
 const gameLoop = ()=>{
     enemyMove()
+    playerEnemyCollision()
+    tieDespawn()
 }
 const movePlayer = () => { //".has" comprueba si existe en el Set
     if (keysPressed.has("d")) {
@@ -97,8 +96,31 @@ const tieDespawn = () =>{
 const gameOver = ()=>{
 clearInterval(mainInterval)
 clearInterval(tieInterval)
-gameScreenNode.style.display = "none"
-gameOverScreenNode.style.display = "flex"
+/*gameScreenNode.style.display = "none"
+gameOverScreenNode.style.display = "flex"*/
+}
+const playerEnemyCollision = () =>{
+    tieArr.forEach((eachTie)=>{
+        if (
+            eachTie.x < player.x + player.w &&
+            eachTie.x + eachTie.w > player.x &&
+            eachTie.y < player.y + player.h &&
+            eachTie.y + eachTie.h > player.y
+          ) {
+           gameOver()
+          } })
+
+    tieArr2.forEach((eachTie)=>{
+         if (
+            eachTie.x < player.x + player.w &&
+            eachTie.x + eachTie.w > player.x &&
+            eachTie.y < player.y + player.h &&
+            eachTie.y + eachTie.h > player.y
+             ) {
+             gameOver()
+            } 
+
+    })
 }
 
 
