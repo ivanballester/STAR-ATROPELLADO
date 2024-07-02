@@ -4,7 +4,7 @@ console.log("conectado");
 const startScreenNode = document.querySelector("#start-screen");
 const gameScreenNode = document.querySelector("#game-screen");
 const finalScreenNode = document.querySelector("#game-over-screen");
-const timerNode = document.querySelector("#timer")
+const timerNode = document.querySelector("#timer");
 
 //BOTONES
 const startBtnNode = document.querySelector("#start-btn");
@@ -18,13 +18,14 @@ const gameBoxNode = document.querySelector("#game-box");
 
 //VARIABLES
 const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a una repeticion de las mismas
-let timerInterval= null;
+let timerInterval = null;
 let minutos = 0;
 let segundos = 0;
 let mainInterval = null;
 let player = null;
 let tieInterval = null;
 let laserInterval = null;
+let miniBossCreated = false;
 let tieArr = [];
 let tieArr2 = [];
 let disparoArr = [];
@@ -34,7 +35,7 @@ let disparoArr = [];
 const startGame = () => {
   //console.log("Iniciando el juego");
   player = new Player();
-  startTimer()
+  startTimer();
   mainInterval = setInterval(() => {
     gameLoop();
   }, Math.round(1000 / 60));
@@ -50,16 +51,16 @@ const startGame = () => {
   }, 300);
 };
 const gameLoop = () => {
-  enemyMove();
-  playerEnemyCollision();
-  tieDespawn();
   disparoArr.forEach((disparo) => {
     disparo.disparoMovement();
   });
+  enemyMove();
+  playerEnemyCollision();
+  tieDespawn();
   disparoDespawn();
   disparoEnemyCollision();
-  newMiniBoss()
-}
+  newMiniBoss();
+};
 const movePlayer = () => {
   //".has" comprueba si existe en el Set
   if (keysPressed.has("d")) {
@@ -100,14 +101,23 @@ const tieSpawn = () => {
     tieArr.push(
       new Enemigo(
         Math.random() * (gameBoxNode.offsetWidth - 38),
-        gameBoxNode.offsetHeight, 1, 38, 38
+        gameBoxNode.offsetHeight,
+        1,
+        38,
+        38
       )
     );
   }
 
   for (let i = 0; i < 5; i++) {
     tieArr2.push(
-      new Enemigo(Math.random() * (gameBoxNode.offsetWidth - 38), -38, 1, 38, 38)
+      new Enemigo(
+        Math.random() * (gameBoxNode.offsetWidth - 38),
+        -38,
+        1,
+        38,
+        38
+      )
     );
   }
 };
@@ -134,7 +144,7 @@ const gameOver = () => {
   clearInterval(mainInterval);
   clearInterval(tieInterval);
   clearInterval(laserInterval);
-  stopTimer()
+  stopTimer();
   /*gameScreenNode.style.display = "none"
 gameOverScreenNode.style.display = "flex"*/
 };
@@ -242,32 +252,43 @@ const disparoEnemyCollision = () => {
     disparoArr.splice(index, 1);
   });
 };
-const newMiniBoss = ()=>{
-    if (timerNode.innerText === "00:05"){
-
-        let destructor = new Enemigo (gameBoxNode.offsetWidth/2, -60, 10, 150, 150)
-        destructor.node.src = "/images/destructor.png"
-    }
-}
-const startTimer = () =>{
-    timerInterval = setInterval(updateTimer, 1000)
-    // Llama la funcion updateTimer cada segundo y almacena dicho intervalo
-}
-const stopTimer = ()=>{
-    clearInterval(timerInterval)
-}
-const updateTimer = () =>{
-    segundos++ //sumamos 1 cada vez que es llamada la funcion
-    if (segundos === 60){
-        minutos ++;
-        segundos = 0;
-    }
-    if (minutos === 3){
-        gameOver();
-    }
-    // Dice: Si minutos es menor que 10, añadimos 0 a minutos(04:00), si no, string vacio + minutos(14:00)
-    timerNode.innerText =  `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-}
+const newMiniBoss = () => {
+    //Creamos un setpoint(00.05) y aseguramos que no se ha creado
+  if (segundos === 5 && !miniBossCreated) {
+    let destructor = new Enemigo(
+      gameBoxNode.offsetWidth / 2,
+      -60,
+      10,
+      150,
+      150
+    );
+    destructor.node.src = "/images/destructor.png";
+    tieArr2.push(destructor)
+    miniBossCreated = true; //Le damos true para que no vuelva a crearse
+    console.log("Ay mi madre el bixooooo")
+  }
+};
+const startTimer = () => {
+  timerInterval = setInterval(updateTimer, 1000);
+  // Llama la funcion updateTimer cada segundo y almacena dicho intervalo
+};
+const stopTimer = () => {
+  clearInterval(timerInterval);
+};
+const updateTimer = () => {
+  segundos++; //sumamos 1 cada vez que es llamada la funcion
+  if (segundos === 60) {
+    minutos++;
+    segundos = 0;
+  }
+  if (minutos === 3) {
+    gameOver();
+  }
+  // Dice: Si minutos es menor que 10, añadimos 0 a minutos(04:00), si no, string vacio + minutos(14:00)
+  timerNode.innerText = `${minutos < 10 ? "0" : ""}${minutos}:${
+    segundos < 10 ? "0" : ""
+  }${segundos}`;
+};
 
 //EVENTOS
 
