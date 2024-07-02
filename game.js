@@ -42,7 +42,7 @@ const startGame = () => {
   laserInterval = setInterval(() => {
     disparoSpawn();
     //console.log(disparoArr);
-  }, 250);
+  }, 300);
 };
 const gameLoop = () => {
   enemyMove();
@@ -124,7 +124,6 @@ const tieDespawn = () => {
     return true; // Se mantiene en el array
   });
 };
-
 const gameOver = () => {
   clearInterval(mainInterval);
   clearInterval(tieInterval);
@@ -160,8 +159,8 @@ const disparoSpawn = () => {
   let playerCenterX = player.x + player.node.offsetWidth / 2;
   let playerCenterY = player.y + player.node.offsetHeight / 2;
 
-  let disparoX = playerCenterX -1;
-  let disparoY = playerCenterY -1;
+  let disparoX = playerCenterX - 1;
+  let disparoY = playerCenterY - 1;
 
   let disparo = new Disparo(disparoX, disparoY, player.orientacion);
   disparoArr.push(disparo);
@@ -183,11 +182,10 @@ const disparoDespawn = () => {
   });
 };
 const disparoEnemyCollision = () => {
-  const disparosToRemove = []; //lista de indice de los disparos a eliminar
-  const enemigosToRemove = []; //lista de enemigos a eliminar, incluyendo array e indice
+  const disparosAQuitar = []; // Lista de índices de disparos a eliminar
 
   disparoArr.forEach((disparo, disparoIndice) => {
-    // Iteramos sobre cada disparo
+    // Iteramos sobre cada disparo y comprobamos colisión con los enemigos en tieArr
     tieArr.forEach((enemigo, enemigoIndice) => {
       if (
         disparo.x < enemigo.x + enemigo.w &&
@@ -195,14 +193,21 @@ const disparoEnemyCollision = () => {
         disparo.y < enemigo.y + enemigo.h &&
         disparo.y + disparo.h > enemigo.y
       ) {
-        console.log("Colision con enemigo");
-        //si hay colision, eliminamos nodos y almacenamos indices
-        enemigo.node.remove();
-        disparo.node.remove();
-        disparosToRemove.push(disparoIndice);
-        enemigosToRemove.push({ arr: tieArr, index: enemigoIndice });
+        console.log("Enemy damaged!!!!");
+        enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
+
+        // Si la vida del enemigo es menor o igual a 0, eliminar el nodo del enemigo
+        if (enemigo.vida <= 0) {
+          enemigo.node.remove();
+          tieArr.splice(enemigoIndice, 1);
+        }
+
+        disparo.node.remove(); // Elimina el nodo del disparo
+        disparosAQuitar.push(disparoIndice);
       }
     });
+
+    // Comprobamos colisión con los enemigos en tieArr2
     tieArr2.forEach((enemigo, enemigoIndice) => {
       if (
         disparo.x < enemigo.x + enemigo.w &&
@@ -210,22 +215,24 @@ const disparoEnemyCollision = () => {
         disparo.y < enemigo.y + enemigo.h &&
         disparo.y + disparo.h > enemigo.y
       ) {
-        console.log("Colision con enemigo");
-        //si hay colision, eliminamos nodos y almacenamos indices
-        enemigo.node.remove();
-        disparo.node.remove();
-        disparosToRemove.push(disparoIndice);
-        enemigosToRemove.push({ arr: tieArr2, index: enemigoIndice });
+        console.log("Enemy damaged!!!");
+        enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
+
+        // Si la vida del enemigo es menor o igual a 0, elimina el nodo del enemigo
+        if (enemigo.vida <= 0) {
+          enemigo.node.remove();
+          tieArr2.splice(enemigoIndice, 1);
+        }
+
+        disparo.node.remove(); // Elimina el nodo del disparo
+        disparosAQuitar.push(disparoIndice);
       }
     });
   });
 
-  // Eliminar disparos en orden inverso para evitar problemas con el indice
-  disparosToRemove.reverse().forEach((index) => {
+  // Eliminar disparos en orden inverso para evitar problemas con el índice
+  disparosAQuitar.reverse().forEach((index) => {
     disparoArr.splice(index, 1);
-  });
-  enemigosToRemove.reverse().forEach(({ arr, index }) => {
-    arr.splice(index, 1);
   });
 };
 

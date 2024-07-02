@@ -1,5 +1,5 @@
 class Enemigo {
-    constructor(x, y, ){
+    constructor(x, y, vida){
         this.node = document.createElement("img")
         this.node.src = "/images/tie.png"
         gameBoxNode.append(this.node)
@@ -8,6 +8,7 @@ class Enemigo {
         this.y = y
         this.w = 38 
         this.h = 38
+        this.vida = 1
         
 
         this.speed = 1
@@ -26,6 +27,16 @@ class Enemigo {
     movement2(){
         this.y += this.speed
         this.node.style.top = `${this.y}px` 
+    }
+
+    recibirDisparo (){
+        this.vida--;
+        if (this.vida <= 0){
+            this.node.remove();
+            return true // Enemigo tiene vida aun
+        }
+        return false // Enemigo eliminado?
+
     }
 
 }  
