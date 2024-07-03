@@ -13,19 +13,20 @@ startBtnNode.addEventListener("click", () => {
   startBtnNode.style.display = "none";
 });
 
-const restartBtn = document.querySelector("#restart-btn")
-restartBtn.addEventListener("click", ()=>{
+const restartBtn = document.querySelector("#restart-btn");
+restartBtn.addEventListener("click", () => {
   finalScreenNode.style.display = "none";
-  document.querySelector("#titulo1").innerText = "STAR"
-  document.querySelector("#titulo2").innerText = "ATROPELLAO'"
-  document.querySelector("#titulo1").style.color = "white"
-  document.querySelector("#titulo2").style.color = "white"
-  document.querySelector("body").style.backgroundImage = "url(./images/fondo2.jpg)"
+  document.querySelector("#titulo1").innerText = "STAR";
+  document.querySelector("#titulo2").innerText = "ATROPELLAO'";
+  document.querySelector("#titulo1").style.color = "white";
+  document.querySelector("#titulo2").style.color = "white";
+  document.querySelector("body").style.backgroundImage =
+    "url(./images/fondo2.jpg)";
   player = null;
-  startBtnNode.style.display = "flex"
-  restartBtn.style.display = "none"
-  timerNode.style.display = "flex"
-})
+  startBtnNode.style.display = "flex";
+  restartBtn.style.display = "none";
+  timerNode.style.display = "flex";
+});
 
 //GAME BOX
 const gameBoxNode = document.querySelector("#game-box");
@@ -39,12 +40,13 @@ let mainInterval = null;
 let player = null;
 let tieInterval = null;
 let laserInterval = null;
-let destructor = null;
+let destructor1 = null;
+let destructor2 = null;
 let miniBossCreated = false;
 let tieArr = [];
 let tieArr2 = [];
 let disparoArr = [];
-let velocidadDisparo = 300  // Limpiar intervalo, acto seguido inicar uno nuevo
+let attackRate = 300; // Limpiar intervalo, acto seguido inicar uno nuevo
 //FUNCIONES DEL JUEGO
 
 const startGame = () => {
@@ -63,7 +65,7 @@ const startGame = () => {
   laserInterval = setInterval(() => {
     disparoSpawn();
     //console.log(disparoArr);
-  }, velocidadDisparo);
+  }, attackRate);
 };
 const gameLoop = () => {
   disparoArr.forEach((disparo) => {
@@ -162,7 +164,6 @@ const gameOver = () => {
   stopTimer();
   finalScreen();
   finalClear();
-
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -255,6 +256,14 @@ const disparoEnemyCollision = () => {
         if (enemigo.vida <= 0) {
           enemigo.node.remove();
           tieArr2.splice(enemigoIndice, 1);
+          if (enemigo === destructor1 || enemigo === destructor2) {
+            attackRate -= 50; // Aumentar velocidad (disminuir intervalo)
+            clearInterval(laserInterval);
+            laserInterval = setInterval(() => {
+              disparoSpawn();
+            }, attackRate);
+            console.log("Disparo speed increased!");
+          }
         }
 
         disparo.node.remove(); // Elimina el nodo del disparo
@@ -269,19 +278,34 @@ const disparoEnemyCollision = () => {
   });
 };
 const newMiniBoss = () => {
-  //Creamos un setpoint(00.05) y aseguramos que no se ha creado
-  if (segundos === 5 && !miniBossCreated) {
-     destructor = new Enemigo(
-      gameBoxNode.offsetWidth / 2,
+  if (segundos === 10 && !miniBossCreated) {
+    const tercioI = gameBoxNode.offsetWidth / 3;
+    const randomX1 = Math.random() * tercioI;
+
+    destructor1 = new Enemigo(
+      randomX1, // Posición en el tercio izquierdo del gameBox
       -60,
       10,
       150,
       150
     );
-    destructor.node.src = "./images/destructor.png";
-    tieArr2.push(destructor);
-    miniBossCreated = true; //Le damos true para que no vuelva a crearse
-    console.log("Ay mi madre el bixooooo");
+    destructor1.node.src = "./images/destructor.png";
+
+    const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
+    const randomX2 = tercioD + Math.random() * tercioI;
+
+    destructor2 = new Enemigo(
+      randomX2, // Posición en el tercio derecho del gameBox
+      -60,
+      10,
+      150,
+      150
+    );
+    destructor2.node.src = "./images/destructor.png";
+
+    tieArr2.push(destructor1, destructor2);
+    miniBossCreated = true; // Le damos true para que no vuelva a crearse
+    console.log("Ay mi madre los bixoooooos");
   }
 };
 const startTimer = () => {
@@ -306,43 +330,42 @@ const updateTimer = () => {
   }${segundos}`;
 };
 const finalScreen = () => {
-  document.querySelector("body").style.backgroundColor = "#000000"
-  document.querySelector("body").style.backgroundImage = "none"
-  restartBtn.style.display = "flex"
-  timerNode.style.display = "none"
+  document.querySelector("body").style.backgroundColor = "#000000";
+  document.querySelector("body").style.backgroundImage = "none";
+  restartBtn.style.display = "flex";
+  timerNode.style.display = "none";
   finalScreenNode.style.display = "block";
-  let posicion = -800
+  let posicion = -800;
   let interval = setInterval(() => {
-    if (posicion >= 0){
-      clearInterval(interval)
+    if (posicion >= 0) {
+      clearInterval(interval);
     } else {
       posicion += 10;
-      finalScreenNode.style.top = posicion +"px"
+      finalScreenNode.style.top = posicion + "px";
     }
   }, 20);
-    document.querySelector("#titulo1").innerText = "GAME"
-    document.querySelector("#titulo2").innerText = "OVER"
-    document.querySelector("#titulo1").style.color = "red"
-    document.querySelector("#titulo2").style.color = "red"
-  
-
-}
+  document.querySelector("#titulo1").innerText = "GAME";
+  document.querySelector("#titulo2").innerText = "OVER";
+  document.querySelector("#titulo1").style.color = "red";
+  document.querySelector("#titulo2").style.color = "red";
+};
 const finalClear = () => {
-  tieArr.forEach((tie) => tie.node.remove())
-  tieArr2.forEach((tie) => tie.node.remove())
-  disparoArr.forEach((disparo) => disparo.node.remove())
-  player.node.remove()
-  destructor.node.remove()
+  tieArr.forEach((tie) => tie.node.remove());
+  tieArr2.forEach((tie) => tie.node.remove());
+  disparoArr.forEach((disparo) => disparo.node.remove());
+  player.node.remove();
+  destructor1.node.remove();
+  destructor2.node.remove();
   tieArr = [];
   tieArr2 = [];
   disparoArr = [];
-  destructor = null;
+  destructor1 = null;
+  destructor2 = null;
   miniBossCreated = false;
   minutos = 0;
   segundos = 0;
   timerNode.innerText = "00:00";
-
-}
+};
 
 //EVENTOS
 
