@@ -146,6 +146,13 @@ const gameOver = () => {
   clearInterval(laserInterval);
   stopTimer();
   finalScreen()
+  enemies.node.remove()
+  player.node.remove()
+  destructor.node.remove()
+  tieArr = [];
+  tieArr2 = [];
+  disparoArr = [];
+
 
   //1. remover todos los nodos del juego
   //2. vaciar los arrays y pasar a nulo los objetos de juego
@@ -293,6 +300,7 @@ const updateTimer = () => {
 };
 const finalScreen = () => {
   document.querySelector("body").style.backgroundColor = "#4B0706"
+  document.querySelector("body").style.backgroundImage = "none"
   timerNode.style.display = "none"
   finalScreenNode.style.display = "block";
   let posicion = -800

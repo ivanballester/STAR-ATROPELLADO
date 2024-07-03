@@ -1,7 +1,10 @@
+
 body {
     margin: 0;
     padding: 0;
-    background-color: lightgray;
+    background-image: url(./images/fondo2.jpg);
+    background-position: center;
+    background-size: cover;
   }
   #start-btn {
     background-color: black;
@@ -27,7 +30,7 @@ body {
     height: 800px;
     position: relative;
     user-select: none;
-    /*background-image: url(images/spac2.jpg);*/
+    background-image: url(./images/universo.jpg);
     background-position: center;
     background-size: cover;
     padding: 0;

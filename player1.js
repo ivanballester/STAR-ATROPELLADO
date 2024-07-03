@@ -17,26 +17,4 @@ class Player {
         this.node.style.left = `${this.x}px`
     }
 
-    /*movement (){
-        document.addEventListener("keydown",(event) => {
-            if (event.key === "ArrowRight"){
-                this.x += 1
-                this.node.style.left = `${this.x}px`
-            }
-        
-            if (event.key === "ArrowLeft"){
-                this.x -= 1
-                this.node.style.left = `${this.x}px`
-            }
-            if (event.key === "ArrowRight"){
-                paddleX += 10
-                paddleNode.style.left = `${paddleX}px`
-            }
-        
-            if (event.key === "ArrowLeft"){
-                paddleX -= 10
-                paddleNode.style.left = `${paddleX}px`
-            }
-        })
-    }*/
 }
