@@ -1,7 +1,7 @@
 class Player {
     constructor (){
         this.node = document.createElement("img")
-        this.node.src = "/images/wingX.png"
+        this.node.src = "./images/wingX.png"
         gameBoxNode.append(this.node)
         this.x = 300 
         this.y = 400 

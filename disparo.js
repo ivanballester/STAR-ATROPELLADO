@@ -1,7 +1,7 @@
 class Disparo {
   constructor(posicion1, posicion2, orientacion) {
     this.node = document.createElement("img");
-    this.node.src = "/images/laserAB.png";
+    this.node.src = "./images/laserAB.png";
     gameBoxNode.append(this.node);
 
     this.orientacion = orientacion;
@@ -21,25 +21,25 @@ class Disparo {
 
   disparoMovement() {
     if (this.orientacion === "derecha") {
-      this.node.src = "/images/laserDI.png";
+      this.node.src = "./images/laserDI.png";
       this.w = 25;
       this.h = 3;
       this.x += this.speed;
     }
     if (this.orientacion === "izquierda") {
-      this.node.src = "/images/laserDI.png";
+      this.node.src = "./images/laserDI.png";
       this.w = 25;
       this.h = 3;
       this.x -= this.speed;
     }
     if (this.orientacion === "abajo") {
-      this.node.src = "/images/laserAB.png";
+      this.node.src = "./images/laserAB.png";
       this.w = 3;
       this.h = 25;
       this.y += this.speed;
     }
     if (this.orientacion === "arriba") {
-      this.node.src = "/images/laserAB.png";
+      this.node.src = "./images/laserAB.png";
       this.w = 3;
       this.h = 25;
       this.y -= this.speed;

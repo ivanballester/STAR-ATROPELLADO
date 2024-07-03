@@ -29,7 +29,7 @@ let miniBossCreated = false;
 let tieArr = [];
 let tieArr2 = [];
 let disparoArr = [];
-
+let velocidadDisparo = 300  // Limpiar intervalo, acto seguido inicar uno nuevo
 //FUNCIONES DEL JUEGO
 
 const startGame = () => {
@@ -48,7 +48,7 @@ const startGame = () => {
   laserInterval = setInterval(() => {
     disparoSpawn();
     //console.log(disparoArr);
-  }, 300);
+  }, velocidadDisparo);
 };
 const gameLoop = () => {
   disparoArr.forEach((disparo) => {
@@ -145,8 +145,10 @@ const gameOver = () => {
   clearInterval(tieInterval);
   clearInterval(laserInterval);
   stopTimer();
-  /*gameScreenNode.style.display = "none"
-gameOverScreenNode.style.display = "flex"*/
+  finalScreen()
+
+  //1. remover todos los nodos del juego
+  //2. vaciar los arrays y pasar a nulo los objetos de juego
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -253,7 +255,7 @@ const disparoEnemyCollision = () => {
   });
 };
 const newMiniBoss = () => {
-    //Creamos un setpoint(00.05) y aseguramos que no se ha creado
+  //Creamos un setpoint(00.05) y aseguramos que no se ha creado
   if (segundos === 5 && !miniBossCreated) {
     let destructor = new Enemigo(
       gameBoxNode.offsetWidth / 2,
@@ -263,9 +265,9 @@ const newMiniBoss = () => {
       150
     );
     destructor.node.src = "/images/destructor.png";
-    tieArr2.push(destructor)
+    tieArr2.push(destructor);
     miniBossCreated = true; //Le damos true para que no vuelva a crearse
-    console.log("Ay mi madre el bixooooo")
+    console.log("Ay mi madre el bixooooo");
   }
 };
 const startTimer = () => {
@@ -281,7 +283,7 @@ const updateTimer = () => {
     minutos++;
     segundos = 0;
   }
-  if (minutos === 3) {
+  if (minutos === 2) {
     gameOver();
   }
   // Dice: Si minutos es menor que 10, añadimos 0 a minutos(04:00), si no, string vacio + minutos(14:00)
@@ -289,6 +291,25 @@ const updateTimer = () => {
     segundos < 10 ? "0" : ""
   }${segundos}`;
 };
+const finalScreen = () => {
+  document.querySelector("body").style.backgroundColor = "#4B0706"
+  timerNode.style.display = "none"
+  finalScreenNode.style.display = "block";
+  let posicion = -800
+  let interval = setInterval(() => {
+    if (posicion >= 0){
+      clearInterval(interval)
+    } else {
+      posicion += 5;
+      finalScreenNode.style.top = posicion +"px"
+    }
+  }, 20);
+  setTimeout(() => {
+    document.querySelector("#titulo1").innerText = "GAME"
+    document.querySelector("#titulo2").innerText = "OVER"
+  }, 1000);
+
+}
 
 //EVENTOS
 

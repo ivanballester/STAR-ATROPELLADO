@@ -1,7 +1,7 @@
 class Enemigo {
   constructor(x, y, vida, w, h) {
     this.node = document.createElement("img");
-    this.node.src = "/images/tie.png";
+    this.node.src = "./images/tie.png";
     gameBoxNode.append(this.node);
 
     this.x = x;
