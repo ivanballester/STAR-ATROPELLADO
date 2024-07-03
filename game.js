@@ -64,22 +64,22 @@ const gameLoop = () => {
 const movePlayer = () => {
   //".has" comprueba si existe en el Set
   if (keysPressed.has("d")) {
-    player.node.src = "/images/wingXD.png";
+    player.node.src = "./images/wingXD.png";
     player.orientacion = "derecha";
     player.x += 10;
   }
   if (keysPressed.has("a")) {
-    player.node.src = "/images/wingXI.png";
+    player.node.src = "./images/wingXI.png";
     player.orientacion = "izquierda";
     player.x -= 10;
   }
   if (keysPressed.has("s")) {
-    player.node.src = "/images/wingXA.png";
+    player.node.src = "./images/wingXA.png";
     player.orientacion = "abajo";
     player.y += 10;
   }
   if (keysPressed.has("w")) {
-    player.node.src = "/images/wingX.png";
+    player.node.src = "./images/wingX.png";
     player.orientacion = "arriba";
     player.y -= 10;
   }
@@ -264,7 +264,7 @@ const newMiniBoss = () => {
       150,
       150
     );
-    destructor.node.src = "/images/destructor.png";
+    destructor.node.src = "./images/destructor.png";
     tieArr2.push(destructor);
     miniBossCreated = true; //Le damos true para que no vuelva a crearse
     console.log("Ay mi madre el bixooooo");
