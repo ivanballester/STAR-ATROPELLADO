@@ -26,13 +26,4 @@ class Enemigo {
     this.y += this.speed;
     this.node.style.top = `${this.y}px`;
   }
-
-  /*moveToPlayer(playerX, playerY) {
-    //Calculo la diferencia coordenadas jugador/enemigo
-    this.x += (playerX - this.x) * this.speed;
-    this.y += (playerY - this.y) * this.speed;
-
-    this.node.style.top = `${this.y}px`;
-    this.node.style.left = `${this.x}px`;
-  }*/
 }

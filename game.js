@@ -13,6 +13,20 @@ startBtnNode.addEventListener("click", () => {
   startBtnNode.style.display = "none";
 });
 
+const restartBtn = document.querySelector("#restart-btn")
+restartBtn.addEventListener("click", ()=>{
+  finalScreenNode.style.display = "none";
+  document.querySelector("#titulo1").innerText = "STAR"
+  document.querySelector("#titulo2").innerText = "ATROPELLAO'"
+  document.querySelector("#titulo1").style.color = "white"
+  document.querySelector("#titulo2").style.color = "white"
+  document.querySelector("body").style.backgroundImage = "url(./images/fondo2.jpg)"
+  player = null;
+  startBtnNode.style.display = "flex"
+  restartBtn.style.display = "none"
+  timerNode.style.display = "flex"
+})
+
 //GAME BOX
 const gameBoxNode = document.querySelector("#game-box");
 
@@ -25,6 +39,7 @@ let mainInterval = null;
 let player = null;
 let tieInterval = null;
 let laserInterval = null;
+let destructor = null;
 let miniBossCreated = false;
 let tieArr = [];
 let tieArr2 = [];
@@ -145,17 +160,9 @@ const gameOver = () => {
   clearInterval(tieInterval);
   clearInterval(laserInterval);
   stopTimer();
-  finalScreen()
-  enemies.node.remove()
-  player.node.remove()
-  destructor.node.remove()
-  tieArr = [];
-  tieArr2 = [];
-  disparoArr = [];
+  finalScreen();
+  finalClear();
 
-
-  //1. remover todos los nodos del juego
-  //2. vaciar los arrays y pasar a nulo los objetos de juego
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -264,7 +271,7 @@ const disparoEnemyCollision = () => {
 const newMiniBoss = () => {
   //Creamos un setpoint(00.05) y aseguramos que no se ha creado
   if (segundos === 5 && !miniBossCreated) {
-    let destructor = new Enemigo(
+     destructor = new Enemigo(
       gameBoxNode.offsetWidth / 2,
       -60,
       10,
@@ -299,8 +306,9 @@ const updateTimer = () => {
   }${segundos}`;
 };
 const finalScreen = () => {
-  document.querySelector("body").style.backgroundColor = "#4B0706"
+  document.querySelector("body").style.backgroundColor = "#000000"
   document.querySelector("body").style.backgroundImage = "none"
+  restartBtn.style.display = "flex"
   timerNode.style.display = "none"
   finalScreenNode.style.display = "block";
   let posicion = -800
@@ -308,14 +316,31 @@ const finalScreen = () => {
     if (posicion >= 0){
       clearInterval(interval)
     } else {
-      posicion += 5;
+      posicion += 10;
       finalScreenNode.style.top = posicion +"px"
     }
   }, 20);
-  setTimeout(() => {
     document.querySelector("#titulo1").innerText = "GAME"
     document.querySelector("#titulo2").innerText = "OVER"
-  }, 1000);
+    document.querySelector("#titulo1").style.color = "red"
+    document.querySelector("#titulo2").style.color = "red"
+  
+
+}
+const finalClear = () => {
+  tieArr.forEach((tie) => tie.node.remove())
+  tieArr2.forEach((tie) => tie.node.remove())
+  disparoArr.forEach((disparo) => disparo.node.remove())
+  player.node.remove()
+  destructor.node.remove()
+  tieArr = [];
+  tieArr2 = [];
+  disparoArr = [];
+  destructor = null;
+  miniBossCreated = false;
+  minutos = 0;
+  segundos = 0;
+  timerNode.innerText = "00:00";
 
 }
 
