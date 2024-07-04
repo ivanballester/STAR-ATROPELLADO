@@ -26,29 +26,33 @@ restartBtn.addEventListener("click", () => {
   startBtnNode.style.display = "flex";
   restartBtn.style.display = "none";
   timerNode.style.display = "flex";
-  gameoverSound.pause()
+  gameoverSound.pause();
   gameoverSound.currentTime = 0;
+  attackRate = 300;
+  attackSpeed = 10;
+  playerMoveSpeed = 20;
 });
 
 //GAME BOX
 const gameBoxNode = document.querySelector("#game-box");
 
 //AUDIOS
-const vadertie34Audio = new Audio ("./sounds/vadertie34.mp3")
-vadertie34Audio.volume = 0.05
-const vadertie12Audio = new Audio ("./sounds/vadertie12.mp3")
-vadertie12Audio.volume = 0.05
-const bossAudio = new Audio ("./sounds/boss.mp3")
-bossAudio.volume = 0.1
-const backgroundMusic = new Audio ("./sounds/gamesound.mp3")
+const laserAudio = new Audio("./sounds/laser.mp3");
+laserAudio.volume = 0.02;
+const vadertie34Audio = new Audio("./sounds/vadertie34.mp3");
+vadertie34Audio.volume = 0.1;
+const vadertie12Audio = new Audio("./sounds/vadertie12.mp3");
+vadertie12Audio.volume = 0.1;
+const bossAudio = new Audio("./sounds/boss.mp3");
+bossAudio.volume = 0.1;
+const backgroundMusic = new Audio("./sounds/gamesound.mp3");
 backgroundMusic.loop = true;
-backgroundMusic.volume = 0.1
+backgroundMusic.volume = 0.1;
 backgroundMusic.currentTime = 0;
-const gameoverSound = new Audio ("./sounds/gameover.mp3");
+const gameoverSound = new Audio("./sounds/gameover.mp3");
 gameoverSound.loop = true;
-gameoverSound.volume = 0.1
+gameoverSound.volume = 0.1;
 gameoverSound.currentTime = 0;
-
 
 //VARIABLES
 const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a una repeticion de las mismas
@@ -59,15 +63,9 @@ let mainInterval = null;
 let player = null;
 let tieInterval = null;
 let laserInterval = null;
-let destructor1 = null;
-let destructor2 = null;
-let vadertie1 = null;
-let vadertie2 = null;
-let vadertie3 = null;
-let vadertie4 = null;
 let finalBoss = null;
 let isFinalBossCreated = false;
-let finalBossSpeed = 4;
+let finalBossSpeed = 5.5;
 let isDestructorCreated = false;
 let isVadertieCreated = false;
 let tieArr = [];
@@ -83,8 +81,8 @@ const startGame = () => {
   //console.log("Iniciando el juego");
   player = new Player();
   backgroundMusic.currentTime = 0;
-  backgroundMusic.play(); 
-  playerMoveSpeed=20;
+  backgroundMusic.play();
+  playerMoveSpeed = 20;
   startTimer();
   mainInterval = setInterval(() => {
     gameLoop();
@@ -110,8 +108,8 @@ const gameLoop = () => {
   disparoDespawn();
   disparoEnemyCollision();
   newMiniBoss();
-  finalBossF()
-  cambioDeAudio()
+  finalBossF();
+  cambioDeAudio();
 };
 const movePlayer = () => {
   //".has" comprueba si existe en el Set
@@ -160,8 +158,8 @@ const enemyMove = () => {
   tieArr2.forEach((enemigo) => {
     enemigo.movement2();
   });
-  if (isFinalBossCreated){
-    finalBoss.bossMovement()
+  if (isFinalBossCreated) {
+    finalBoss.bossMovement();
   }
 };
 const tieSpawn = () => {
@@ -173,7 +171,10 @@ const tieSpawn = () => {
         1,
         38,
         38,
-        1
+        1,
+        1,
+        1,
+        "basico"
       )
     );
   }
@@ -186,7 +187,10 @@ const tieSpawn = () => {
         1,
         38,
         38,
-        1
+        1,
+        1,
+        1,
+        "basico"
       )
     );
   }
@@ -217,12 +221,12 @@ const gameOver = () => {
   stopTimer();
   finalScreen();
   finalClear();
-  backgroundMusic.pause()
+  backgroundMusic.pause();
   backgroundMusic.currentTime = 0;
   gameoverSound.play();
-  bossAudio.pause()
+  bossAudio.pause();
   bossAudio.currentTime = 0;
-  vadertie12Audio.pause ();
+  vadertie12Audio.pause();
   vadertie12Audio.currentTime = 0;
   vadertie34Audio.pause();
   vadertie34Audio.currentTime = 0;
@@ -250,7 +254,7 @@ const playerEnemyCollision = () => {
       gameOver();
     }
   });
-  bossPlayerCollision()
+  bossPlayerCollision();
 };
 const disparoSpawn = () => {
   let playerCenterX = player.x + player.node.offsetWidth / 2;
@@ -259,8 +263,15 @@ const disparoSpawn = () => {
   let disparoX = playerCenterX - 1;
   let disparoY = playerCenterY - 1;
 
-  let disparo = new Disparo(disparoX, disparoY, player.orientacion, attackSpeed);
+  let disparo = new Disparo(
+    disparoX,
+    disparoY,
+    player.orientacion,
+    attackSpeed
+  );
   disparoArr.push(disparo);
+
+  disparoAudio();
 };
 const disparoDespawn = () => {
   disparoArr = disparoArr.filter((disparo) => {
@@ -279,7 +290,7 @@ const disparoDespawn = () => {
   });
 };
 const disparoEnemyCollision = () => {
-  const disparosAQuitar = []; // Lista de índices de disparos a eliminar
+  //const disparosAQuitar = []; // Lista de índices de disparos a eliminar
 
   disparoArr.forEach((disparo, disparoIndice) => {
     // Iteramos sobre cada disparo y comprobamos colisión con los enemigos en tieArr
@@ -292,19 +303,21 @@ const disparoEnemyCollision = () => {
       ) {
         //console.log("Enemy damaged!!!!");
         enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
+        disparo.node.remove(); // Elimina el nodo del disparo
+        disparoArr.splice(disparoIndice, 1);
 
         // Si la vida del enemigo es menor o igual a 0, eliminar el nodo del enemigo
         if (enemigo.vida <= 0) {
           enemigo.node.remove();
           tieArr.splice(enemigoIndice, 1);
-          if (enemigo === vadertie3 || enemigo === vadertie4){
-            attackSpeed += 20
-            playerMoveSpeed += 1
+
+          if (enemigo.type === "tie") {
+            attackSpeed += 20;
+            playerMoveSpeed += 1;
           }
         }
 
-        disparo.node.remove(); // Elimina el nodo del disparo
-        disparosAQuitar.push(disparoIndice);
+        //disparosAQuitar.push(disparoIndice);
       }
     });
 
@@ -316,14 +329,16 @@ const disparoEnemyCollision = () => {
         disparo.y < enemigo.y + enemigo.h &&
         disparo.y + disparo.h > enemigo.y
       ) {
-       // console.log("Enemy damaged!!!");
+        disparoArr.splice(disparoIndice, 1);
         enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
-
+        disparo.node.remove(); // Elimina el nodo del disparo
         // Si la vida del enemigo es menor o igual a 0, elimina el nodo del enemigo
+
         if (enemigo.vida <= 0) {
           enemigo.node.remove();
           tieArr2.splice(enemigoIndice, 1);
-          if (enemigo === destructor1 || enemigo === destructor2) {
+
+          if (enemigo.type === "destructor") {
             attackRate -= 60; // Aumentar velocidad (disminuir intervalo)
             playerMoveSpeed += 1;
             clearInterval(laserInterval);
@@ -332,70 +347,78 @@ const disparoEnemyCollision = () => {
             }, attackRate);
             console.log("Attack speed increased!");
           }
-          
-          if (enemigo === vadertie1 || enemigo === vadertie2){
-            attackSpeed += 20
-            playerMoveSpeed += 2
+
+          if (enemigo.type === "tie") {
+            attackSpeed += 20;
+            playerMoveSpeed += 2;
           }
         }
 
-        disparo.node.remove(); // Elimina el nodo del disparo
-        disparosAQuitar.push(disparoIndice);
+        // disparosAQuitar.push(disparoIndice);
       }
     });
-     //Comprobamos colision con el finalBoss
-     if (isFinalBossCreated && finalBoss){
-     if (
-      disparo.x < finalBoss.x + finalBoss.w &&
-      disparo.x + disparo.w > finalBoss.x &&
-      disparo.y < finalBoss.y + finalBoss.h &&
-      disparo.y + disparo.h > finalBoss.y
-    ) {
-      finalBoss.vida -= disparo.damage;
-      disparo.node.remove();
-      disparoArr.splice(disparoIndice, 1);
+    //Comprobamos colision con el finalBoss
+    if (isFinalBossCreated && finalBoss) {
+      if (
+        disparo.x < finalBoss.x + finalBoss.w &&
+        disparo.x + disparo.w > finalBoss.x &&
+        disparo.y < finalBoss.y + finalBoss.h &&
+        disparo.y + disparo.h > finalBoss.y
+      ) {
+        finalBoss.vida -= disparo.damage;
+        disparo.node.remove();
+        disparoArr.splice(disparoIndice, 1);
 
-      // Si la vida del boss llega a cero o menos, muere
-      if (finalBoss.vida <= 0) {
-        finalBoss.node.remove();
-        isFinalBossCreated = false; // Reiniciar bandera de creación del boss
+        // Si la vida del boss llega a cero o menos, muere
+        if (finalBoss.vida <= 0) {
+          finalBoss.node.remove();
+          isFinalBossCreated = false; // Reiniciar bandera de creación del boss
+          // youWin()
+        }
       }
-    }}
+    }
   });
-
-   
 
   // Eliminar disparos en orden inverso para evitar problemas con el índice
-  disparosAQuitar.reverse().forEach((index) => {
+  /* disparosAQuitar.reverse().forEach((index) => {
     disparoArr.splice(index, 1);
-  });
+  });*/
 };
 const newMiniBoss = () => {
   //MINIBOSS NUMBER 1
-  if ((segundos === 5 || timerNode.innerText ==="01:05") && !isDestructorCreated) {
+  if (
+    (segundos === 5 || timerNode.innerText === "01:05") &&
+    !isDestructorCreated
+  ) {
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
-    destructor1 = new Enemigo(
+    let destructor1 = new Enemigo(
       randomX1, // Posición en el tercio izquierdo del gameBox
       -60,
       10,
       150,
       150,
-      0.5
+      0.5,
+      1,
+      1,
+      "destructor"
     );
     destructor1.node.src = "./images/destructor.png";
 
     const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
     const randomX2 = tercioD + Math.random() * tercioI;
 
-    destructor2 = new Enemigo(
+    let destructor2 = new Enemigo(
       randomX2, // Posición en el tercio derecho del gameBox
       -60,
       10,
       150,
       150,
-      0.5
+      0.5,
+      1,
+      1,
+      "destructor"
     );
     destructor2.node.src = "./images/destructor.png";
 
@@ -408,32 +431,41 @@ const newMiniBoss = () => {
     }, 1000);
   }
 
-// MINIBOSS NUMBER 2 from top
-  if ((segundos === 25|| timerNode.innerText ==="01:25") && !isVadertieCreated) {
-    vadertie12Audio.play()
+  // MINIBOSS NUMBER 2 from top
+  if (
+    (segundos === 25 || timerNode.innerText === "01:25") &&
+    !isVadertieCreated
+  ) {
+    vadertie12Audio.play();
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
-    vadertie1 = new Enemigo(
+    let vadertie1 = new Enemigo(
       randomX1, // Posición en el tercio izquierdo del gameBox
       -60,
       5,
       100,
       100,
-      2
+      2,
+      1,
+      1,
+      "tie"
     );
     vadertie1.node.src = "./images/vadertie.png";
 
     const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
     const randomX2 = tercioD + Math.random() * tercioI;
 
-    vadertie2 = new Enemigo(
+    let vadertie2 = new Enemigo(
       randomX2, // Posición en el tercio derecho del gameBox
       -60,
       5,
       100,
       100,
-      2
+      2,
+      1,
+      1,
+      "tie"
     );
     vadertie2.node.src = "./images/vadertie.png";
 
@@ -449,34 +481,43 @@ const newMiniBoss = () => {
 
   //MINIBOSS 2 from bot
 
-  if ((segundos === 35 || timerNode.innerText ==="01:35") && !isVadertieCreated) {
-    vadertie34Audio.play()
+  if (
+    (segundos === 35 || timerNode.innerText === "01:35") &&
+    !isVadertieCreated
+  ) {
+    vadertie34Audio.play();
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
-    vadertie3 = new Enemigo(
+    let vadertie3 = new Enemigo(
       randomX1, // Posición en el tercio izquierdo del gameBox
       gameBoxNode.offsetHeight,
       5,
       100,
       100,
-      2
+      2,
+      1,
+      1,
+      "tie"
     );
     vadertie3.node.src = "./images/vadertie.png";
 
     const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
     const randomX2 = tercioD + Math.random() * tercioI;
 
-    vadertie4 = new Enemigo(
+    let vadertie4 = new Enemigo(
       randomX2, // Posición en el tercio derecho del gameBox
       gameBoxNode.offsetHeight,
       5,
       100,
       100,
-      2
+      2,
+      1,
+      1,
+      "tie"
     );
     vadertie4.node.src = "./images/vadertie.png";
-    
+
     tieArr.push(vadertie3, vadertie4);
 
     isVadertieCreated = true; // Le damos true para que no vuelva a crearse
@@ -486,9 +527,6 @@ const newMiniBoss = () => {
       isVadertieCreated = false;
     }, 1000);
   }
- 
-  
-  
 };
 const startTimer = () => {
   timerInterval = setInterval(updateTimer, 1000);
@@ -536,23 +574,24 @@ const finalClear = () => {
   tieArr2.forEach((tie) => tie.node.remove());
   disparoArr.forEach((disparo) => disparo.node.remove());
   player.node.remove();
-  if (isDestructorCreated){destructor1.node.remove();
-  destructor2.node.remove();}
+  if (isDestructorCreated) {
+    destructor1.node.remove();
+    destructor2.node.remove();
+  }
   if (isVadertieCreated) {
-  vadertie1.node.remove()
-  vadertie2.node.remove()
-  vadertie3.node.remove()
-  vadertie4.node.remove()}
-  if (isFinalBossCreated){finalBoss.node.remove()}  
+    vadertie1.node.remove();
+    vadertie2.node.remove();
+    vadertie3.node.remove();
+    vadertie4.node.remove();
+  }
+  if (isFinalBossCreated) {
+    finalBoss.node.remove();
+  }
   tieArr = [];
   tieArr2 = [];
   disparoArr = [];
   destructor1 = null;
   destructor2 = null;
-  vadertie1 = null;
-  vadertie2 = null;
-  vadertie3 = null;
-  vadertie4 = null;
   finalBoss = null;
   isDestructorCreated = false;
   isFinalBossCreated = false;
@@ -560,18 +599,27 @@ const finalClear = () => {
   segundos = 0;
   timerNode.innerText = "00:00";
 };
-const finalBossF = () =>{
+const finalBossF = () => {
   if (timerNode.innerText === "01:10" && !isFinalBossCreated) {
     const randomX = Math.random() * (gameBoxNode.offsetWidth - 100);
     const randomY = Math.random() * (gameBoxNode.offsetHeight - 100);
 
-    finalBoss = new Enemigo (randomX, randomY, 20, 115, 115, finalBossSpeed, finalBossSpeed, finalBossSpeed);
+    finalBoss = new Enemigo(
+      randomX,
+      randomY,
+      30,
+      115,
+      115,
+      finalBossSpeed,
+      finalBossSpeed,
+      finalBossSpeed,
+      "boss"
+    );
     finalBoss.node.src = "./images/finalBoss.png";
     isFinalBossCreated = true;
-    
   }
-}
-const bossPlayerCollision = () =>{
+};
+const bossPlayerCollision = () => {
   if (isFinalBossCreated) {
     if (
       finalBoss.x < player.x + player.w &&
@@ -582,14 +630,19 @@ const bossPlayerCollision = () =>{
       gameOver();
     }
   }
-}
-const cambioDeAudio = () =>{
-  if (minutos === 1 && segundos === 0){
-    backgroundMusic.pause()
+};
+const cambioDeAudio = () => {
+  if (minutos === 1 && segundos === 0) {
+    backgroundMusic.pause();
     backgroundMusic.currentTime = 0;
-    bossAudio.play()
+    bossAudio.play();
   }
-}
+};
+const disparoAudio = () => {
+  let clonarLaser = laserAudio.cloneNode(); //Al clonar cada copia es independiente pues consigo
+  clonarLaser.play(); // que puedan reproducirse de manera independiente
+  clonarLaser.volume = 0.005;
+};
 
 //EVENTOS
 
