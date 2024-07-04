@@ -7,6 +7,7 @@ const gameScreenNode = document.querySelector("#game-screen");
 const finalScreenNode = document.querySelector("#game-over-screen");
 const winScren = document.querySelector("#win-screen")
 const timerNode = document.querySelector("#timer");
+const volumeSlider = document.querySelector("#volume-slider");
 
 //BOTONES
 const startBtnNode = document.querySelector("#start-btn");
@@ -45,24 +46,25 @@ const gameBoxNode = document.querySelector("#game-box");
 
 //AUDIOS
 const laserAudio = new Audio("./sounds/laser.mp3");
-laserAudio.volume = 0.02;
+/*const laserVolume = 0.02;
+laserAudio.volume = laserVolume;*/
 const vadertie34Audio = new Audio("./sounds/vadertie34.mp3");
-vadertie34Audio.volume = 0.15;
+//vadertie34Audio.volume = 0.15;
 const vadertie12Audio = new Audio("./sounds/vadertie12.mp3");
-vadertie12Audio.volume = 0.15;
+//vadertie12Audio.volume = 0.15;
 const bossAudio = new Audio("./sounds/boss.mp3");
-bossAudio.volume = 0.1;
+//bossAudio.volume = 0.1;
 const backgroundMusic = new Audio("./sounds/gamesound.mp3");
 backgroundMusic.loop = true;
-backgroundMusic.volume = 0.1;
+//backgroundMusic.volume = 0.1;
 backgroundMusic.currentTime = 0;
 const gameoverSound = new Audio("./sounds/gameover1.mp3");
 gameoverSound.loop = true;
-gameoverSound.volume = 0.1;
+//gameoverSound.volume = 0.1;
 gameoverSound.currentTime = 157;
 const youWinSound = new Audio ("./sounds/youwin.mp3")
 youWinSound.loop = true;
-youWinSound.volume = 0.1;
+//youWinSound.volume = 0.1;
 youWinSound.currentTime = 0
 
 //VARIABLES
@@ -306,19 +308,17 @@ const disparoSpawn = () => {
   disparoAudio();
 };
 const disparoDespawn = () => {
-  disparoArr = disparoArr.filter((disparo) => {
-    //filtramos array principal
+  disparoArr.forEach((disparo, index) => {
     if (
       disparo.x < 0 ||
       disparo.x > gameBoxNode.offsetWidth ||
       disparo.y < 0 ||
       disparo.y > gameBoxNode.offsetHeight
     ) {
-      //console.log(disparo.x, disparo.y)
       disparo.node.remove();
-      return false; // Elimina este elemento del array
+      disparoArr.splice(index, 1); // Elimina este elemento del array
+      console.log(disparoArr)
     }
-    return true; // Mantiene este elemento en el array
   });
 };
 const disparoEnemyCollision = () => {
@@ -434,8 +434,8 @@ const newMiniBoss = () => {
     const randomX1 = Math.random() * tercioI;
 
     let destructor1 = new Enemigo(
-      randomX1, // Posición en el tercio izquierdo del gameBox
-      -60,
+      randomX1 - 50, // Posición en el tercio izquierdo del gameBox
+      -150,
       10,
       150,
       150,
@@ -450,8 +450,8 @@ const newMiniBoss = () => {
     const randomX2 = tercioD + Math.random() * tercioI;
 
     let destructor2 = new Enemigo(
-      randomX2, // Posición en el tercio derecho del gameBox
-      -60,
+      randomX2 - 50, // Posición en el tercio derecho del gameBox
+      -150,
       10,
       150,
       150,
@@ -481,8 +481,8 @@ const newMiniBoss = () => {
     const randomX1 = Math.random() * tercioI;
 
     let vadertie1 = new Enemigo(
-      randomX1, // Posición en el tercio izquierdo del gameBox
-      -60,
+      randomX1-50, // Posición en el tercio izquierdo del gameBox
+      -100,
       5,
       100,
       100,
@@ -497,8 +497,8 @@ const newMiniBoss = () => {
     const randomX2 = tercioD + Math.random() * tercioI;
 
     let vadertie2 = new Enemigo(
-      randomX2, // Posición en el tercio derecho del gameBox
-      -60,
+      randomX2 - 50, // Posición en el tercio derecho del gameBox
+      -100,
       5,
       100,
       100,
@@ -531,7 +531,7 @@ const newMiniBoss = () => {
 
     let vadertie3 = new Enemigo(
       randomX1, // Posición en el tercio izquierdo del gameBox
-      gameBoxNode.offsetHeight,
+      gameBoxNode.offsetHeight -50,
       5,
       100,
       100,
@@ -547,7 +547,7 @@ const newMiniBoss = () => {
 
     let vadertie4 = new Enemigo(
       randomX2, // Posición en el tercio derecho del gameBox
-      gameBoxNode.offsetHeight,
+      gameBoxNode.offsetHeight -50,
       5,
       100,
       100,
@@ -681,7 +681,7 @@ const cambioDeAudio = () => {
 const disparoAudio = () => {
   let clonarLaser = laserAudio.cloneNode(); //Al clonar cada copia es independiente pues consigo
   clonarLaser.play(); // que puedan reproducirse de manera independiente
-  clonarLaser.volume = 0.005;
+  clonarLaser.volume = 0.003;
 };
 const victory = () =>{
   document.querySelector("body").style.backgroundColor = "#D3BE96";
@@ -716,4 +716,24 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keyup", (event) => {
   //Se activa cuando se suelta una tecla
   keysPressed.delete(event.key); //Borra la tecla que esta en el Set
+});
+
+
+//ALL SLIDER FUNCTIONS testing
+
+function setVolumeForAllAudioElements(volume) {
+  vadertie34Audio.volume = volume;
+  vadertie12Audio.volume = volume;
+  bossAudio.volume = volume;
+  backgroundMusic.volume = volume;
+  gameoverSound.volume = volume;
+  youWinSound.volume = volume;
+}
+
+setVolumeForAllAudioElements(0.05)
+
+// Event listener for the volume slider
+volumeSlider.addEventListener("input", (event) => {
+  const volume = event.target.value / 1000; // Scale 0-100 slider value to 0-0.1 audio volume
+  setVolumeForAllAudioElements(volume);
 });
