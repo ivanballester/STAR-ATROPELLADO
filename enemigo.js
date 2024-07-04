@@ -1,5 +1,5 @@
 class Enemigo {
-  constructor(x, y, vida, w, h) {
+  constructor(x, y, vida, w, h, speed) {
     this.node = document.createElement("img");
     this.node.src = "./images/tie.png";
     gameBoxNode.append(this.node);
@@ -10,7 +10,7 @@ class Enemigo {
     this.h = h;
     this.vida = vida;
 
-    this.speed = 1;
+    this.speed = speed;
 
     this.node.style.position = `absolute`;
     this.node.style.width = `${this.w}px`;

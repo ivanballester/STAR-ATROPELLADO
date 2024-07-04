@@ -11,6 +11,7 @@ const startBtnNode = document.querySelector("#start-btn");
 startBtnNode.addEventListener("click", () => {
   startGame();
   startBtnNode.style.display = "none";
+  backgroundMusic.play();
 });
 
 const restartBtn = document.querySelector("#restart-btn");
@@ -26,10 +27,24 @@ restartBtn.addEventListener("click", () => {
   startBtnNode.style.display = "flex";
   restartBtn.style.display = "none";
   timerNode.style.display = "flex";
+  gameoverSound.pause()
+  gameoverSound.currentTime = 0;
+  backgroundMusic.play()
 });
 
 //GAME BOX
 const gameBoxNode = document.querySelector("#game-box");
+
+//AUDIOS
+const backgroundMusic = new Audio ("./sounds/gamesound.mp3")
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.1
+backgroundMusic.currentTime = 0;
+const gameoverSound = new Audio ("./sounds/gameover.mp3");
+gameoverSound.loop = true;
+gameoverSound.volume = 0.1
+gameoverSound.currentTime = 0;
+
 
 //VARIABLES
 const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a una repeticion de las mismas
@@ -42,7 +57,12 @@ let tieInterval = null;
 let laserInterval = null;
 let destructor1 = null;
 let destructor2 = null;
+let vadertie1 = null;
+let vadertie2 = null;
+let vadertie3 = null;
+let vadertie4 = null;
 let miniBossCreated = false;
+let vadertieCreated = false;
 let tieArr = [];
 let tieArr2 = [];
 let disparoArr = [];
@@ -101,6 +121,19 @@ const movePlayer = () => {
     player.y -= 10;
   }
 
+  if (player.x < 0) {
+    player.x = 0;
+  }
+  if (player.x + player.node.offsetWidth > gameBoxNode.offsetWidth) {
+    player.x = gameBoxNode.offsetWidth - player.node.offsetWidth;
+  }
+  if (player.y < 0) {
+    player.y = 0;
+  }
+  if (player.y + player.node.offsetHeight > gameBoxNode.offsetHeight) {
+    player.y = gameBoxNode.offsetHeight - player.node.offsetHeight;
+  }
+
   player.node.style.left = `${player.x}px`;
   player.node.style.top = `${player.y}px`;
   //console.log(keysPressed);
@@ -121,7 +154,8 @@ const tieSpawn = () => {
         gameBoxNode.offsetHeight,
         1,
         38,
-        38
+        38,
+        1
       )
     );
   }
@@ -133,7 +167,8 @@ const tieSpawn = () => {
         -38,
         1,
         38,
-        38
+        38,
+        1
       )
     );
   }
@@ -164,6 +199,11 @@ const gameOver = () => {
   stopTimer();
   finalScreen();
   finalClear();
+  backgroundMusic.pause()
+  backgroundMusic.currentTime = 0;
+  gameoverSound.play();
+
+
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -227,7 +267,7 @@ const disparoEnemyCollision = () => {
         disparo.y < enemigo.y + enemigo.h &&
         disparo.y + disparo.h > enemigo.y
       ) {
-        console.log("Enemy damaged!!!!");
+        //console.log("Enemy damaged!!!!");
         enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
 
         // Si la vida del enemigo es menor o igual a 0, eliminar el nodo del enemigo
@@ -249,7 +289,7 @@ const disparoEnemyCollision = () => {
         disparo.y < enemigo.y + enemigo.h &&
         disparo.y + disparo.h > enemigo.y
       ) {
-        console.log("Enemy damaged!!!");
+       // console.log("Enemy damaged!!!");
         enemigo.vida -= disparo.damage; // Reduce la vida del enemigo según el daño del disparo
 
         // Si la vida del enemigo es menor o igual a 0, elimina el nodo del enemigo
@@ -257,12 +297,14 @@ const disparoEnemyCollision = () => {
           enemigo.node.remove();
           tieArr2.splice(enemigoIndice, 1);
           if (enemigo === destructor1 || enemigo === destructor2) {
-            attackRate -= 50; // Aumentar velocidad (disminuir intervalo)
+            attackRate -= 60; // Aumentar velocidad (disminuir intervalo)
             clearInterval(laserInterval);
             laserInterval = setInterval(() => {
               disparoSpawn();
             }, attackRate);
-            console.log("Disparo speed increased!");
+            console.log("Attack speed increased!");
+          } else if (enemigo === vadertie1 || enemigo === vadertie2){
+            disparoArr.forEach((disparo) => disparo.speed += 15)
           }
         }
 
@@ -278,7 +320,8 @@ const disparoEnemyCollision = () => {
   });
 };
 const newMiniBoss = () => {
-  if (segundos === 10 && !miniBossCreated) {
+  //MINIBOSS NUMBER 1
+  if ((segundos === 5 || timerNode.innerText ==="01:00") && !miniBossCreated) {
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
@@ -287,7 +330,8 @@ const newMiniBoss = () => {
       -60,
       10,
       150,
-      150
+      150,
+      0.5
     );
     destructor1.node.src = "./images/destructor.png";
 
@@ -299,14 +343,103 @@ const newMiniBoss = () => {
       -60,
       10,
       150,
-      150
+      150,
+      0.5
     );
     destructor2.node.src = "./images/destructor.png";
 
     tieArr2.push(destructor1, destructor2);
     miniBossCreated = true; // Le damos true para que no vuelva a crearse
-    console.log("Ay mi madre los bixoooooos");
+    //console.log("Ay mi madre el bichooooooooooo");
+    //Reset del  booleano
+    setTimeout(() => {
+      miniBossCreated = false;
+    }, 1000);
   }
+
+// MINIBOSS NUMBER 2 from top
+  if ((segundos === 5|| timerNode.innerText ==="01:35") && !vadertieCreated) {
+    new Audio ("./sounds/vadertie12.mp3").play()
+    new Audio ("./sounds/vadertie12.mp3").volume = 0.5
+    const tercioI = gameBoxNode.offsetWidth / 3;
+    const randomX1 = Math.random() * tercioI;
+
+    vadertie1 = new Enemigo(
+      randomX1, // Posición en el tercio izquierdo del gameBox
+      -60,
+      5,
+      100,
+      100,
+      2
+    );
+    vadertie1.node.src = "./images/vadertie.png";
+
+    const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
+    const randomX2 = tercioD + Math.random() * tercioI;
+
+    vadertie2 = new Enemigo(
+      randomX2, // Posición en el tercio derecho del gameBox
+      -60,
+      5,
+      100,
+      100,
+      2
+    );
+    vadertie1.node.src = "./images/vadertie.png";
+
+    tieArr2.push(vadertie1, vadertie2);
+
+    vadertieCreated = true; // Le damos true para que no vuelva a crearse
+    //console.log("Ay mi madre el bichooooooooooo");
+    //Reset del  booleano
+    setTimeout(() => {
+      vadertieCreated = false;
+    }, 1000);
+  }
+
+  //MINIBOSS 2 from bot
+
+  if ((segundos === 40 || timerNode.innerText ==="01:30") && !vadertieCreated) {
+    new Audio ("./sounds/vadertie34.mp3").play()
+    new Audio ("./sounds/vadertie34.mp3").volume = 0.5
+    const tercioI = gameBoxNode.offsetWidth / 3;
+    const randomX1 = Math.random() * tercioI;
+
+    vadertie3 = new Enemigo(
+      randomX1, // Posición en el tercio izquierdo del gameBox
+      gameBoxNode.offsetHeight,
+      5,
+      100,
+      100,
+      2
+    );
+    vadertie3.node.src = "./images/vadertie.png";
+
+    const tercioD = (gameBoxNode.offsetWidth / 3) * 2;
+    const randomX2 = tercioD + Math.random() * tercioI;
+
+    vadertie4 = new Enemigo(
+      randomX2, // Posición en el tercio derecho del gameBox
+      gameBoxNode.offsetHeight,
+      5,
+      100,
+      100,
+      2
+    );
+    vadertie4.node.src = "./images/vadertie.png";
+    
+    tieArr.push(vadertie3, vadertie4);
+
+    vadertieCreated = true; // Le damos true para que no vuelva a crearse
+    //console.log("Ay mi madre el bichooooooooooo");
+    //Reset del  booleano
+    setTimeout(() => {
+      vadertieCreated = false;
+    }, 1000);
+  }
+ 
+  
+  
 };
 const startTimer = () => {
   timerInterval = setInterval(updateTimer, 1000);
