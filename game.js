@@ -11,7 +11,6 @@ const startBtnNode = document.querySelector("#start-btn");
 startBtnNode.addEventListener("click", () => {
   startGame();
   startBtnNode.style.display = "none";
-  backgroundMusic.play();
 });
 
 const restartBtn = document.querySelector("#restart-btn");
@@ -29,13 +28,18 @@ restartBtn.addEventListener("click", () => {
   timerNode.style.display = "flex";
   gameoverSound.pause()
   gameoverSound.currentTime = 0;
-  backgroundMusic.play()
 });
 
 //GAME BOX
 const gameBoxNode = document.querySelector("#game-box");
 
 //AUDIOS
+const vadertie34Audio = new Audio ("./sounds/vadertie34.mp3")
+vadertie34Audio.volume = 0.05
+const vadertie12Audio = new Audio ("./sounds/vadertie12.mp3")
+vadertie12Audio.volume = 0.05
+const bossAudio = new Audio ("./sounds/boss.mp3")
+bossAudio.volume = 0.1
 const backgroundMusic = new Audio ("./sounds/gamesound.mp3")
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.1
@@ -63,7 +67,7 @@ let vadertie3 = null;
 let vadertie4 = null;
 let finalBoss = null;
 let isFinalBossCreated = false;
-let finalBossSpeed = 5;
+let finalBossSpeed = 4;
 let isDestructorCreated = false;
 let isVadertieCreated = false;
 let tieArr = [];
@@ -71,16 +75,16 @@ let tieArr2 = [];
 let disparoArr = [];
 let attackRate = 300; // Limpiar intervalo, acto seguido inicar uno nuevo
 let attackSpeed = 10;
-let playerMoveSpeed = 20
-
-
-
+let playerMoveSpeed = 20;
 
 //FUNCIONES DEL JUEGO
 
 const startGame = () => {
   //console.log("Iniciando el juego");
   player = new Player();
+  backgroundMusic.currentTime = 0;
+  backgroundMusic.play(); 
+  playerMoveSpeed=20;
   startTimer();
   mainInterval = setInterval(() => {
     gameLoop();
@@ -107,7 +111,7 @@ const gameLoop = () => {
   disparoEnemyCollision();
   newMiniBoss();
   finalBossF()
-  bosssoundtrack()
+  cambioDeAudio()
 };
 const movePlayer = () => {
   //".has" comprueba si existe en el Set
@@ -216,8 +220,12 @@ const gameOver = () => {
   backgroundMusic.pause()
   backgroundMusic.currentTime = 0;
   gameoverSound.play();
-  new Audio ("./sounds/boss.mp3").pause()
-  new Audio ("./sounds/boss.mp3"). currentTime = 0;
+  bossAudio.pause()
+  bossAudio.currentTime = 0;
+  vadertie12Audio.pause ();
+  vadertie12Audio.currentTime = 0;
+  vadertie34Audio.pause();
+  vadertie34Audio.currentTime = 0;
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -291,7 +299,7 @@ const disparoEnemyCollision = () => {
           tieArr.splice(enemigoIndice, 1);
           if (enemigo === vadertie3 || enemigo === vadertie4){
             attackSpeed += 20
-            playerMoveSpeed += 2
+            playerMoveSpeed += 1
           }
         }
 
@@ -317,7 +325,7 @@ const disparoEnemyCollision = () => {
           tieArr2.splice(enemigoIndice, 1);
           if (enemigo === destructor1 || enemigo === destructor2) {
             attackRate -= 60; // Aumentar velocidad (disminuir intervalo)
-            playerMoveSpeed += 2
+            playerMoveSpeed += 1;
             clearInterval(laserInterval);
             laserInterval = setInterval(() => {
               disparoSpawn();
@@ -345,7 +353,7 @@ const disparoEnemyCollision = () => {
     ) {
       finalBoss.vida -= disparo.damage;
       disparo.node.remove();
-      disparoArr.splice(index, 1);
+      disparoArr.splice(disparoIndice, 1);
 
       // Si la vida del boss llega a cero o menos, muere
       if (finalBoss.vida <= 0) {
@@ -402,8 +410,7 @@ const newMiniBoss = () => {
 
 // MINIBOSS NUMBER 2 from top
   if ((segundos === 25|| timerNode.innerText ==="01:25") && !isVadertieCreated) {
-    new Audio ("./sounds/vadertie12.mp3").play()
-    new Audio ("./sounds/vadertie12.mp3").volume = 0.5
+    vadertie12Audio.play()
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
@@ -443,8 +450,7 @@ const newMiniBoss = () => {
   //MINIBOSS 2 from bot
 
   if ((segundos === 35 || timerNode.innerText ==="01:35") && !isVadertieCreated) {
-    new Audio ("./sounds/vadertie34.mp3").play()
-    new Audio ("./sounds/vadertie34.mp3").volume = 0.5
+    vadertie34Audio.play()
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
@@ -553,7 +559,6 @@ const finalClear = () => {
   minutos = 0;
   segundos = 0;
   timerNode.innerText = "00:00";
-  playerMoveSpeed = 20;
 };
 const finalBossF = () =>{
   if (timerNode.innerText === "01:10" && !isFinalBossCreated) {
@@ -578,13 +583,13 @@ const bossPlayerCollision = () =>{
     }
   }
 }
-
-  if (segundos === 10){
+const cambioDeAudio = () =>{
+  if (minutos === 1 && segundos === 0){
     backgroundMusic.pause()
-    new Audio ("./sounds/boss.mp3").play()
-    new Audio ("./sounds/boss.mp3").volume = 0.5
+    backgroundMusic.currentTime = 0;
+    bossAudio.play()
   }
-
+}
 
 //EVENTOS
 
