@@ -1,9 +1,11 @@
 console.log("conectado");
 
 //PANTALLAS
+const instrucciones = document.querySelector("#instrucciones")
 const startScreenNode = document.querySelector("#start-screen");
 const gameScreenNode = document.querySelector("#game-screen");
 const finalScreenNode = document.querySelector("#game-over-screen");
+const winScren = document.querySelector("#win-screen")
 const timerNode = document.querySelector("#timer");
 
 //BOTONES
@@ -11,10 +13,12 @@ const startBtnNode = document.querySelector("#start-btn");
 startBtnNode.addEventListener("click", () => {
   startGame();
   startBtnNode.style.display = "none";
+  instrucciones.style.display = "none"
 });
 
 const restartBtn = document.querySelector("#restart-btn");
 restartBtn.addEventListener("click", () => {
+  winScren.style.display = "none"
   finalScreenNode.style.display = "none";
   document.querySelector("#titulo1").innerText = "STAR";
   document.querySelector("#titulo2").innerText = "ATROPELLAO'";
@@ -27,10 +31,13 @@ restartBtn.addEventListener("click", () => {
   restartBtn.style.display = "none";
   timerNode.style.display = "flex";
   gameoverSound.pause();
-  gameoverSound.currentTime = 0;
+  gameoverSound.currentTime = 157;
+  youWinSound.pause ();
+  youWinSound.currentTime = 0
   attackRate = 300;
   attackSpeed = 10;
   playerMoveSpeed = 20;
+  score = 0;
 });
 
 //GAME BOX
@@ -40,25 +47,30 @@ const gameBoxNode = document.querySelector("#game-box");
 const laserAudio = new Audio("./sounds/laser.mp3");
 laserAudio.volume = 0.02;
 const vadertie34Audio = new Audio("./sounds/vadertie34.mp3");
-vadertie34Audio.volume = 0.1;
+vadertie34Audio.volume = 0.15;
 const vadertie12Audio = new Audio("./sounds/vadertie12.mp3");
-vadertie12Audio.volume = 0.1;
+vadertie12Audio.volume = 0.15;
 const bossAudio = new Audio("./sounds/boss.mp3");
 bossAudio.volume = 0.1;
 const backgroundMusic = new Audio("./sounds/gamesound.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.1;
 backgroundMusic.currentTime = 0;
-const gameoverSound = new Audio("./sounds/gameover.mp3");
+const gameoverSound = new Audio("./sounds/gameover1.mp3");
 gameoverSound.loop = true;
 gameoverSound.volume = 0.1;
-gameoverSound.currentTime = 0;
+gameoverSound.currentTime = 157;
+const youWinSound = new Audio ("./sounds/youwin.mp3")
+youWinSound.loop = true;
+youWinSound.volume = 0.1;
+youWinSound.currentTime = 0
 
 //VARIABLES
 const keysPressed = new Set(); // Set almacena teclas activas y no dando lugar a una repeticion de las mismas
 let timerInterval = null;
 let minutos = 0;
 let segundos = 0;
+let score = 0;
 let mainInterval = null;
 let player = null;
 let tieInterval = null;
@@ -83,6 +95,7 @@ const startGame = () => {
   backgroundMusic.currentTime = 0;
   backgroundMusic.play();
   playerMoveSpeed = 20;
+  document.querySelector("#score").innerText = `Score: ${score}`;
   startTimer();
   mainInterval = setInterval(() => {
     gameLoop();
@@ -230,7 +243,26 @@ const gameOver = () => {
   vadertie12Audio.currentTime = 0;
   vadertie34Audio.pause();
   vadertie34Audio.currentTime = 0;
+  document.querySelector("#score").innerText = `Score: ${score}`;
 };
+const youWin = () =>{
+  clearInterval(mainInterval);
+  clearInterval(tieInterval);
+  clearInterval(laserInterval);
+  stopTimer();
+  finalClear();
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
+  youWinSound.play();
+  bossAudio.pause();
+  bossAudio.currentTime = 0;
+  vadertie12Audio.pause();
+  vadertie12Audio.currentTime = 0;
+  vadertie34Audio.pause();
+  vadertie34Audio.currentTime = 0;
+  victory()
+  document.querySelector("#score").innerText = `Score: ${score}`;
+}
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
     //Verificamos en cada array si hay colision
@@ -314,6 +346,9 @@ const disparoEnemyCollision = () => {
           if (enemigo.type === "tie") {
             attackSpeed += 20;
             playerMoveSpeed += 1;
+            score += 30
+          } else {
+            score += 3
           }
         }
 
@@ -341,6 +376,7 @@ const disparoEnemyCollision = () => {
           if (enemigo.type === "destructor") {
             attackRate -= 60; // Aumentar velocidad (disminuir intervalo)
             playerMoveSpeed += 1;
+            score += 50
             clearInterval(laserInterval);
             laserInterval = setInterval(() => {
               disparoSpawn();
@@ -351,6 +387,9 @@ const disparoEnemyCollision = () => {
           if (enemigo.type === "tie") {
             attackSpeed += 20;
             playerMoveSpeed += 2;
+            score += 30
+          } else {
+            score += 3
           }
         }
 
@@ -373,12 +412,13 @@ const disparoEnemyCollision = () => {
         if (finalBoss.vida <= 0) {
           finalBoss.node.remove();
           isFinalBossCreated = false; // Reiniciar bandera de creación del boss
-          // youWin()
+          score += 10000
+          youWin()
         }
       }
     }
   });
-
+  document.querySelector("#score").innerText = `Score: ${score}`;
   // Eliminar disparos en orden inverso para evitar problemas con el índice
   /* disparosAQuitar.reverse().forEach((index) => {
     disparoArr.splice(index, 1);
@@ -542,7 +582,7 @@ const updateTimer = () => {
     segundos = 0;
   }
   if (minutos === 2) {
-    gameOver();
+    youWin();
   }
   // Dice: Si minutos es menor que 10, añadimos 0 a minutos(04:00), si no, string vacio + minutos(14:00)
   timerNode.innerText = `${minutos < 10 ? "0" : ""}${minutos}:${
@@ -643,6 +683,27 @@ const disparoAudio = () => {
   clonarLaser.play(); // que puedan reproducirse de manera independiente
   clonarLaser.volume = 0.005;
 };
+const victory = () =>{
+  document.querySelector("body").style.backgroundColor = "#D3BE96";
+  document.querySelector("body").style.backgroundImage = "none";
+  restartBtn.style.display = "flex";
+  timerNode.style.display = "none";
+  winScren.style.display = "block";
+  let posicion = -800;
+  let interval = setInterval(() => {
+    if (posicion >= 0) {
+      clearInterval(interval);
+    } else {
+      posicion += 10;
+      winScren.style.top = posicion + "px";
+    }
+  }, 20);
+  document.querySelector("#titulo1").innerText = "YOU";
+  document.querySelector("#titulo2").innerText = "WIN!!";
+  document.querySelector("#titulo1").style.color = "lightgreen";
+  document.querySelector("#titulo2").style.color = "lightgreen";
+
+}
 
 //EVENTOS
 

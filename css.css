@@ -95,3 +95,33 @@ body {
   padding: 0;
   margin: 0;
 }
+#instrucciones{
+  display: block;
+  width: 900px;
+  height: 800px;
+  position: absolute;
+  user-select: none;
+  background-image: url(./images/start.jpg);
+  background-position: center;
+  background-size: cover;
+  padding: 0;
+  margin: 0;
+}
+#win-screen {
+  display: none;
+  width: 900px;
+  height: 800px;
+  position: absolute;
+  user-select: none;
+  background-image: url(./images/win.jpg);
+  background-position: center;
+  background-size: cover;
+  padding: 0;
+  margin: 0;
+}
+#score {
+  display: flex;
+  font-size: 30px;
+  color: blue;
+  position: absolute;
+}
