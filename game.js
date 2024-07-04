@@ -61,12 +61,21 @@ let vadertie1 = null;
 let vadertie2 = null;
 let vadertie3 = null;
 let vadertie4 = null;
-let miniBossCreated = false;
-let vadertieCreated = false;
+let finalBoss = null;
+let isFinalBossCreated = false;
+let finalBossSpeed = 5;
+let isDestructorCreated = false;
+let isVadertieCreated = false;
 let tieArr = [];
 let tieArr2 = [];
 let disparoArr = [];
 let attackRate = 300; // Limpiar intervalo, acto seguido inicar uno nuevo
+let attackSpeed = 10;
+let playerMoveSpeed = 20
+
+
+
+
 //FUNCIONES DEL JUEGO
 
 const startGame = () => {
@@ -97,28 +106,30 @@ const gameLoop = () => {
   disparoDespawn();
   disparoEnemyCollision();
   newMiniBoss();
+  finalBossF()
+  bosssoundtrack()
 };
 const movePlayer = () => {
   //".has" comprueba si existe en el Set
   if (keysPressed.has("d")) {
     player.node.src = "./images/wingXD.png";
     player.orientacion = "derecha";
-    player.x += 10;
+    player.x += playerMoveSpeed;
   }
   if (keysPressed.has("a")) {
     player.node.src = "./images/wingXI.png";
     player.orientacion = "izquierda";
-    player.x -= 10;
+    player.x -= playerMoveSpeed;
   }
   if (keysPressed.has("s")) {
     player.node.src = "./images/wingXA.png";
     player.orientacion = "abajo";
-    player.y += 10;
+    player.y += playerMoveSpeed;
   }
   if (keysPressed.has("w")) {
     player.node.src = "./images/wingX.png";
     player.orientacion = "arriba";
-    player.y -= 10;
+    player.y -= playerMoveSpeed;
   }
 
   if (player.x < 0) {
@@ -145,6 +156,9 @@ const enemyMove = () => {
   tieArr2.forEach((enemigo) => {
     enemigo.movement2();
   });
+  if (isFinalBossCreated){
+    finalBoss.bossMovement()
+  }
 };
 const tieSpawn = () => {
   for (let i = 0; i < 5; i++) {
@@ -202,8 +216,8 @@ const gameOver = () => {
   backgroundMusic.pause()
   backgroundMusic.currentTime = 0;
   gameoverSound.play();
-
-
+  new Audio ("./sounds/boss.mp3").pause()
+  new Audio ("./sounds/boss.mp3"). currentTime = 0;
 };
 const playerEnemyCollision = () => {
   tieArr.forEach((eachTie) => {
@@ -228,6 +242,7 @@ const playerEnemyCollision = () => {
       gameOver();
     }
   });
+  bossPlayerCollision()
 };
 const disparoSpawn = () => {
   let playerCenterX = player.x + player.node.offsetWidth / 2;
@@ -236,7 +251,7 @@ const disparoSpawn = () => {
   let disparoX = playerCenterX - 1;
   let disparoY = playerCenterY - 1;
 
-  let disparo = new Disparo(disparoX, disparoY, player.orientacion);
+  let disparo = new Disparo(disparoX, disparoY, player.orientacion, attackSpeed);
   disparoArr.push(disparo);
 };
 const disparoDespawn = () => {
@@ -274,6 +289,10 @@ const disparoEnemyCollision = () => {
         if (enemigo.vida <= 0) {
           enemigo.node.remove();
           tieArr.splice(enemigoIndice, 1);
+          if (enemigo === vadertie3 || enemigo === vadertie4){
+            attackSpeed += 20
+            playerMoveSpeed += 2
+          }
         }
 
         disparo.node.remove(); // Elimina el nodo del disparo
@@ -298,13 +317,17 @@ const disparoEnemyCollision = () => {
           tieArr2.splice(enemigoIndice, 1);
           if (enemigo === destructor1 || enemigo === destructor2) {
             attackRate -= 60; // Aumentar velocidad (disminuir intervalo)
+            playerMoveSpeed += 2
             clearInterval(laserInterval);
             laserInterval = setInterval(() => {
               disparoSpawn();
             }, attackRate);
             console.log("Attack speed increased!");
-          } else if (enemigo === vadertie1 || enemigo === vadertie2){
-            disparoArr.forEach((disparo) => disparo.speed += 15)
+          }
+          
+          if (enemigo === vadertie1 || enemigo === vadertie2){
+            attackSpeed += 20
+            playerMoveSpeed += 2
           }
         }
 
@@ -312,7 +335,27 @@ const disparoEnemyCollision = () => {
         disparosAQuitar.push(disparoIndice);
       }
     });
+     //Comprobamos colision con el finalBoss
+     if (isFinalBossCreated && finalBoss){
+     if (
+      disparo.x < finalBoss.x + finalBoss.w &&
+      disparo.x + disparo.w > finalBoss.x &&
+      disparo.y < finalBoss.y + finalBoss.h &&
+      disparo.y + disparo.h > finalBoss.y
+    ) {
+      finalBoss.vida -= disparo.damage;
+      disparo.node.remove();
+      disparoArr.splice(index, 1);
+
+      // Si la vida del boss llega a cero o menos, muere
+      if (finalBoss.vida <= 0) {
+        finalBoss.node.remove();
+        isFinalBossCreated = false; // Reiniciar bandera de creación del boss
+      }
+    }}
   });
+
+   
 
   // Eliminar disparos en orden inverso para evitar problemas con el índice
   disparosAQuitar.reverse().forEach((index) => {
@@ -321,7 +364,7 @@ const disparoEnemyCollision = () => {
 };
 const newMiniBoss = () => {
   //MINIBOSS NUMBER 1
-  if ((segundos === 5 || timerNode.innerText ==="01:00") && !miniBossCreated) {
+  if ((segundos === 5 || timerNode.innerText ==="01:05") && !isDestructorCreated) {
     const tercioI = gameBoxNode.offsetWidth / 3;
     const randomX1 = Math.random() * tercioI;
 
@@ -349,16 +392,16 @@ const newMiniBoss = () => {
     destructor2.node.src = "./images/destructor.png";
 
     tieArr2.push(destructor1, destructor2);
-    miniBossCreated = true; // Le damos true para que no vuelva a crearse
+    isDestructorCreated = true; // Le damos true para que no vuelva a crearse
     //console.log("Ay mi madre el bichooooooooooo");
     //Reset del  booleano
     setTimeout(() => {
-      miniBossCreated = false;
+      isDestructorCreated = false;
     }, 1000);
   }
 
 // MINIBOSS NUMBER 2 from top
-  if ((segundos === 5|| timerNode.innerText ==="01:35") && !vadertieCreated) {
+  if ((segundos === 25|| timerNode.innerText ==="01:25") && !isVadertieCreated) {
     new Audio ("./sounds/vadertie12.mp3").play()
     new Audio ("./sounds/vadertie12.mp3").volume = 0.5
     const tercioI = gameBoxNode.offsetWidth / 3;
@@ -385,21 +428,21 @@ const newMiniBoss = () => {
       100,
       2
     );
-    vadertie1.node.src = "./images/vadertie.png";
+    vadertie2.node.src = "./images/vadertie.png";
 
     tieArr2.push(vadertie1, vadertie2);
 
-    vadertieCreated = true; // Le damos true para que no vuelva a crearse
+    isVadertieCreated = true; // Le damos true para que no vuelva a crearse
     //console.log("Ay mi madre el bichooooooooooo");
     //Reset del  booleano
     setTimeout(() => {
-      vadertieCreated = false;
+      isVadertieCreated = false;
     }, 1000);
   }
 
   //MINIBOSS 2 from bot
 
-  if ((segundos === 40 || timerNode.innerText ==="01:30") && !vadertieCreated) {
+  if ((segundos === 35 || timerNode.innerText ==="01:35") && !isVadertieCreated) {
     new Audio ("./sounds/vadertie34.mp3").play()
     new Audio ("./sounds/vadertie34.mp3").volume = 0.5
     const tercioI = gameBoxNode.offsetWidth / 3;
@@ -430,11 +473,11 @@ const newMiniBoss = () => {
     
     tieArr.push(vadertie3, vadertie4);
 
-    vadertieCreated = true; // Le damos true para que no vuelva a crearse
+    isVadertieCreated = true; // Le damos true para que no vuelva a crearse
     //console.log("Ay mi madre el bichooooooooooo");
     //Reset del  booleano
     setTimeout(() => {
-      vadertieCreated = false;
+      isVadertieCreated = false;
     }, 1000);
   }
  
@@ -487,18 +530,61 @@ const finalClear = () => {
   tieArr2.forEach((tie) => tie.node.remove());
   disparoArr.forEach((disparo) => disparo.node.remove());
   player.node.remove();
-  destructor1.node.remove();
-  destructor2.node.remove();
+  if (isDestructorCreated){destructor1.node.remove();
+  destructor2.node.remove();}
+  if (isVadertieCreated) {
+  vadertie1.node.remove()
+  vadertie2.node.remove()
+  vadertie3.node.remove()
+  vadertie4.node.remove()}
+  if (isFinalBossCreated){finalBoss.node.remove()}  
   tieArr = [];
   tieArr2 = [];
   disparoArr = [];
   destructor1 = null;
   destructor2 = null;
-  miniBossCreated = false;
+  vadertie1 = null;
+  vadertie2 = null;
+  vadertie3 = null;
+  vadertie4 = null;
+  finalBoss = null;
+  isDestructorCreated = false;
+  isFinalBossCreated = false;
   minutos = 0;
   segundos = 0;
   timerNode.innerText = "00:00";
+  playerMoveSpeed = 20;
 };
+const finalBossF = () =>{
+  if (timerNode.innerText === "01:10" && !isFinalBossCreated) {
+    const randomX = Math.random() * (gameBoxNode.offsetWidth - 100);
+    const randomY = Math.random() * (gameBoxNode.offsetHeight - 100);
+
+    finalBoss = new Enemigo (randomX, randomY, 20, 115, 115, finalBossSpeed, finalBossSpeed, finalBossSpeed);
+    finalBoss.node.src = "./images/finalBoss.png";
+    isFinalBossCreated = true;
+    
+  }
+}
+const bossPlayerCollision = () =>{
+  if (isFinalBossCreated) {
+    if (
+      finalBoss.x < player.x + player.w &&
+      finalBoss.x + finalBoss.w > player.x &&
+      finalBoss.y < player.y + player.h &&
+      finalBoss.y + finalBoss.h > player.y
+    ) {
+      gameOver();
+    }
+  }
+}
+
+  if (segundos === 10){
+    backgroundMusic.pause()
+    new Audio ("./sounds/boss.mp3").play()
+    new Audio ("./sounds/boss.mp3").volume = 0.5
+  }
+
 
 //EVENTOS
 

@@ -1,5 +1,5 @@
 class Disparo {
-  constructor(posicion1, posicion2, orientacion) {
+  constructor(posicion1, posicion2, orientacion, attackSpeed) {
     this.node = document.createElement("img");
     this.node.src = "./images/laserAB.png";
     gameBoxNode.append(this.node);
@@ -9,7 +9,7 @@ class Disparo {
     this.y = posicion2;
     this.w = 5;
     this.h = 5;
-    this.speed = 10;
+    this.speed = attackSpeed;
     this.damage = 1
 
     this.node.style.position = `absolute`;

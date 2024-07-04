@@ -39,7 +39,7 @@ body {
   }
 #game-box{
     background-color: black;
-    width: 800px;
+    width: 900px;
     height: 800px;
     position: relative;
     user-select: none;
@@ -85,11 +85,11 @@ body {
 }
 #game-over-screen{
   display: none;
-  width: 800px;
+  width: 900px;
   height: 800px;
   position: absolute;
   user-select: none;
-  background-image: url(./images/file3.jpg);
+  background-image: url(./images/final.jpg);
   background-position: center;
   background-size: cover;
   padding: 0;
