@@ -79,7 +79,7 @@ let tieInterval = null;
 let laserInterval = null;
 let finalBoss = null;
 let isFinalBossCreated = false;
-let finalBossSpeed = 5.5;
+let finalBossSpeed = 4;
 let isDestructorCreated = false;
 let isVadertieCreated = false;
 let tieArr = [];
@@ -641,6 +641,7 @@ const finalClear = () => {
 };
 const finalBossF = () => {
   if (timerNode.innerText === "01:10" && !isFinalBossCreated) {
+    new Audio ("./sounds/heheha.mp3").play()
     const randomX = Math.random() * (gameBoxNode.offsetWidth - 100);
     const randomY = Math.random() * (gameBoxNode.offsetHeight - 100);
 

@@ -127,7 +127,7 @@ body {
 }
 
 /*RANGER SLIDER FROM w3*/
-
+/* https://www.w3schools.com/howto/howto_js_rangeslider.asp */
 
 
 
@@ -136,7 +136,7 @@ body {
   display: flex;
   justify-content:center;
   position: absolute;
-  left:200px;
+  left:550px;
   top:1020px;
   align-items: center;
 
