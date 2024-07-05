@@ -134,9 +134,9 @@ body {
 .slidecontainer {
   width: 100px; /* Width of the outside container */
   display: flex;
-  justify-content:center;
-  position: absolute;
-  left:550px;
+  justify-content:flex-start;
+  position:absolute;
+  left: 300px;
   top:1020px;
   align-items: center;
 

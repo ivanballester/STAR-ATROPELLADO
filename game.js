@@ -45,6 +45,7 @@ restartBtn.addEventListener("click", () => {
 const gameBoxNode = document.querySelector("#game-box");
 
 //AUDIOS
+const hehehehaAudio= new Audio ("./sounds/heheha.mp3")
 const laserAudio = new Audio("./sounds/laser.mp3");
 /*const laserVolume = 0.02;
 laserAudio.volume = laserVolume;*/
@@ -641,7 +642,7 @@ const finalClear = () => {
 };
 const finalBossF = () => {
   if (timerNode.innerText === "01:10" && !isFinalBossCreated) {
-    new Audio ("./sounds/heheha.mp3").play()
+    hehehehaAudio.play()
     const randomX = Math.random() * (gameBoxNode.offsetWidth - 100);
     const randomY = Math.random() * (gameBoxNode.offsetHeight - 100);
 
@@ -729,6 +730,7 @@ function setVolumeForAllAudioElements(volume) {
   backgroundMusic.volume = volume;
   gameoverSound.volume = volume;
   youWinSound.volume = volume;
+  hehehehaAudio.volume = volume;
 }
 
 setVolumeForAllAudioElements(0.05)
